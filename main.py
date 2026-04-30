@@ -57,15 +57,23 @@ custom_css = """
     /* ========================
        FONT FIX (SAFE TARGETING)
        ======================== */
-    /* Target elements safely to avoid breaking Streamlit Material Icons */
-    .stApp, .stApp *{
+    /* ========================
+       FONT FIX (CLEAN TARGETING)
+       ======================== */
+    /* Target common user text elements directly to prevent breaking internal Streamlit icons */
+    h1, h2, h3, h4, h5, h6, p, label, li, input, textarea, th, td, 
+    .stMarkdown, .stText, .stMetric, div[data-baseweb="select"],
+    .hero-title, .hero-subtitle, .card-title, .metric-value, .metric-label, .result-title, .result-prob {
         font-family: 'VT323', monospace !important;
         letter-spacing: 1px !important;
     }
-
-    .material-symbols-rounded, .material-icons, svg {
-        font-family: inherit !important;
-        letter-spacing: normal !important;
+    
+    div[data-testid="stMetricValue"], 
+    div[data-testid="stMetricLabel"], 
+    div.stDataFrame div, 
+    div.stTable div,
+    div.stButton > button {
+        font-family: 'VT323', monospace !important;
     }
 
     /* Centered Container */
@@ -321,15 +329,54 @@ custom_css = """
         color: #000000 !important;
     }
 
-    [data-testid="stSidebar"] *:not(svg):not(i):not([class*="material"]) {
-    font-family: 'VT323', monospace !important;
+    /* Cleaned up complex icon overrides; VT323 is now strictly applied only to text components. */
+    
+    /* Heartbeat Grid */
+    .heartbeat-box {
+        background-color: var(--panel-bg);
+        border: 2px solid var(--border-color);
+        box-shadow: 4px 4px 0px var(--shadow-color);
+        padding: 20px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+        min-height: 200px;
+        transition: transform 0.2s ease-in-out;
     }
-
-    /* ========================
-    FIX SIDEBAR TOGGLE ICON
-    ======================== */
-    [data-testid="collapsedControl"] button {
-    font-family: sans-serif !important;
+    .heartbeat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 6px 6px 0px var(--shadow-color);
+    }
+    .heartbeat-box::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100' viewBox='0 0 200 100'%3E%3Cpath d='M0 60 L30 60 L40 20 L55 90 L65 60 L200 60' fill='none' stroke='%2310b981' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' opacity='0.15'/%3E%3C/svg%3E");
+        background-repeat: repeat-x;
+        background-position: center;
+        background-size: 200px 100px;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .heartbeat-content {
+        position: relative;
+        z-index: 1;
+        font-size: 1.25rem;
+        line-height: 1.5;
+        color: var(--text-color);
+        font-family: 'VT323', monospace !important;
+        letter-spacing: 1px;
+    }
+    .heartbeat-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--text-color);
+        margin-bottom: 10px;
+        border-bottom: 2px dashed var(--border-color);
+        display: inline-block;
+        padding-bottom: 4px;
+        font-family: 'VT323', monospace !important;
+    }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -409,17 +456,49 @@ def render_step_0():
     st.markdown("<br>", unsafe_allow_html=True)
 
     with st.container(border=True):
-        st.markdown('<div class="card-title">SYSTEM INSTRUCTIONS</div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div style="font-size: 1.4rem; line-height: 1.6; color: var(--text-color);">
-        <b>[ROLE]:</b> DOCTOR<br>
-        <b>[TASK]:</b> RUN DIAGNOSTICS ON PATIENT METABOLIC DATA<br>
-        <b>[EXPECTED OUTPUT]:</b> PROBABILITY OF DIABETES RISK<br>
-        <b>[DATA SOURCE]:</b> PIMA INDIANS DATABASE<br>
-        <br>
-        > READY TO INITIATE SCAN...
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown('<div class="card-title">SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("""
+            <div class="heartbeat-box">
+                <div class="heartbeat-content">
+                    <div class="heartbeat-title">[PROGRAM FUNCTION]</div>
+                    <br>This terminal is a machine learning-powered application designed to assist healthcare professionals in predicting the onset of diabetes based on medical diagnostic measurements.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class="heartbeat-box">
+                <div class="heartbeat-content">
+                    <div class="heartbeat-title">[EXPECTED OUTPUT]</div>
+                    <br>The system will output a definitive diagnostic prediction (Positive or Negative for Diabetes) along with the statistical probability of the disease risk.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with col2:
+            st.markdown("""
+            <div class="heartbeat-box">
+                <div class="heartbeat-content">
+                    <div class="heartbeat-title">[OBJECTIVES]</div>
+                    <br>The main goal is to provide a rapid, accurate, and early-warning screening tool that analyzes clinical data to identify patients at high risk for diabetes.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            st.markdown("""
+            <div class="heartbeat-box">
+                <div class="heartbeat-content">
+                    <div class="heartbeat-title">[DATASET DESCRIPTION]</div>
+                    <br>The models are trained using the Pima Indians Diabetes Database. It contains essential metabolic predictor variables collected specifically to study diabetes patterns.
+                    <br><br><b>[DATA SOURCE LINK]:</b> <a href="https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database" target="_blank" style="color: inherit; text-decoration: underline; font-weight: bold;">Kaggle: Pima Indians Database</a>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<div style='font-size: 1.4rem; font-family: VT323, monospace; color: var(--text-color); text-align: center; margin-top: 15px; letter-spacing: 1px;'> > PRESS INITIALIZE TO BEGIN SYSTEM DIAGNOSTICS... </div><br>", unsafe_allow_html=True)
         
         st.write("")
         if st.button("INITIALIZE DIAGNOSTICS", type="primary", use_container_width=True):
