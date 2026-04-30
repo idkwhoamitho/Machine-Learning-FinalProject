@@ -12,119 +12,175 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
-st.set_page_config(page_title="Diabetes Risk Prediction System", page_icon="🧬", layout="wide")
+st.set_page_config(page_title="Pixel Hospital System", page_icon="🕹️", layout="wide")
 
 custom_css = """
 <style>
-    /* Global Background and Font */
-    .stApp {
-        background-color: #f8fafc;
-        font-family: 'Inter', sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+    /* Variables for adaptive modes */
+    :root {
+        --bg-color: #f0fdf4;
+        --panel-bg: #ffffff;
+        --text-color: #000000;
+        --border-color: #000000;
+        --primary: #22c55e;
+        --secondary: #38bdf8;
+        --accent: #facc15;
+        --danger: #ef4444;
+        --shadow-color: #000000;
     }
-    
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg-color: #052e16;
+            --panel-bg: #064e3b;
+            --text-color: #ecfdf5;
+            --border-color: #10b981;
+            --shadow-color: #022c22;
+            --primary: #4ade80;
+            --secondary: #7dd3fc;
+            --accent: #fde047;
+            --danger: #f87171;
+        }
+    }
+
+    /* Global Typography and Background */
+    .stApp {
+        background-color: var(--bg-color);
+        font-family: 'VT323', monospace !important;
+        background-image: linear-gradient(rgba(34, 197, 94, 0.05) 50%, transparent 50%);
+        background-size: 100% 4px; /* Scanline effect */
+    }
+
+    p, span, div, h1, h2, h3, h4, h5, h6, label {
+        font-family: 'VT323', monospace !important;
+        letter-spacing: 1px;
+    }
+
     /* Centered Container */
     .main .block-container {
         max-width: 900px;
         padding-top: 2rem;
         padding-bottom: 2rem;
-        animation: fadeIn 0.5s ease-out;
+        animation: fadeIn 0.3s ease-out;
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(15px); }
+        from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Card styling leveraging Streamlit's border containers */
+    /* Pixel Panels */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: #ffffff;
-        border-radius: 16px !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-        border: 1px solid #f1f5f9 !important;
+        background-color: var(--panel-bg);
+        border: 4px solid var(--border-color) !important;
+        border-radius: 0px !important;
+        box-shadow: 6px 6px 0px var(--shadow-color) !important;
         padding: 24px !important;
         margin-bottom: 24px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s;
     }
-
-    /* Images */
-    img {
-        max-width: 100%;
-        height: auto;
-        object-fit: contain;
-        border-radius: 12px;
+    
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 8px 8px 0px var(--shadow-color) !important;
     }
 
     /* Buttons */
     div.stButton > button {
-        border-radius: 12px !important;
+        background-color: var(--panel-bg) !important;
+        border: 4px solid var(--border-color) !important;
+        border-radius: 0px !important;
+        box-shadow: 4px 4px 0px var(--shadow-color) !important;
+        color: var(--text-color) !important;
         font-weight: 600 !important;
-        transition: all 0.2s ease !important;
         padding: 10px 24px !important;
+        text-transform: uppercase;
+        font-size: 1.4rem !important;
+        transition: all 0.1s !important;
     }
     div.stButton > button:hover {
-        transform: scale(1.03) !important;
+        background-color: var(--secondary) !important;
+        color: #000 !important;
+        border-color: #000 !important;
+    }
+    div.stButton > button:active {
+        transform: translate(2px, 2px) !important;
+        box-shadow: 2px 2px 0px var(--shadow-color) !important;
     }
     
-    /* Primary Button Override */
+    /* Primary Button */
     div.stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-        border: none !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
-        color: white !important;
+        background-color: var(--primary) !important;
+        color: #000 !important;
+        border-color: #000 !important;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background-color: var(--accent) !important;
     }
 
-    /* Sidebar Stepper styles */
+    /* Sidebar Menu */
     [data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e2e8f0;
+        background-color: var(--panel-bg);
+        border-right: 4px solid var(--border-color);
     }
     [data-testid="stSidebar"] .stButton > button {
         justify-content: flex-start !important;
         text-align: left !important;
         background: transparent !important;
-        border: 1px solid transparent !important;
-        color: #64748b !important;
+        border: none !important;
         box-shadow: none !important;
-        padding: 14px 16px !important;
-        margin-bottom: 6px !important;
-        border-radius: 8px !important;
+        color: var(--text-color) !important;
+        padding: 12px 16px !important;
+        margin-bottom: 4px !important;
+        font-size: 1.5rem !important;
     }
     [data-testid="stSidebar"] .stButton > button:hover {
-        background: #f8fafc !important;
-        color: #0f172a !important;
+        background: var(--accent) !important;
+        color: #000 !important;
         transform: none !important;
     }
     [data-testid="stSidebar"] .stButton > button[kind="primary"] {
-        background: #eff6ff !important;
-        color: #2563eb !important;
-        border-left: 4px solid #3b82f6 !important;
-        border-radius: 4px 8px 8px 4px !important;
-        font-weight: 700 !important;
+        background: var(--primary) !important;
+        color: #000 !important;
+        border: 4px solid #000 !important;
+        box-shadow: 4px 4px 0px #000 !important;
     }
 
-    /* Custom HTML Classes */
+    /* Titles */
     .hero-title {
-        font-size: 2.8rem;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.2;
+        font-size: 3.5rem;
+        font-weight: bold;
+        color: var(--text-color);
+        text-transform: uppercase;
         margin-bottom: 0.5rem;
+        line-height: 1.1;
     }
     .hero-subtitle {
-        font-size: 1.2rem;
-        color: #64748b;
+        font-size: 1.6rem;
+        color: var(--secondary);
         margin-bottom: 1.5rem;
     }
     .card-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #f1f5f9;
-        padding-bottom: 0.8rem;
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--text-color);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        border-bottom: 4px dashed var(--border-color);
+        padding-bottom: 0.5rem;
     }
 
-    /* Metrics Grid */
+    /* Cursor blink */
+    .blink {
+        animation: blink-animation 1s steps(2, start) infinite;
+    }
+    @keyframes blink-animation {
+        to { visibility: hidden; }
+    }
+
+    /* Metrics */
     .metrics-wrapper {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -132,58 +188,67 @@ custom_css = """
         margin-bottom: 30px;
     }
     .metric-box {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 24px 20px;
+        background: var(--panel-bg);
+        border: 4px solid var(--border-color);
+        box-shadow: 4px 4px 0px var(--shadow-color);
+        padding: 20px;
         text-align: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        border: 1px solid #e2e8f0;
     }
     .metric-value {
-        font-size: 2.4rem;
-        font-weight: 800;
-        margin-bottom: 6px;
-        line-height: 1;
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
     .metric-label {
-        font-size: 0.85rem;
-        color: #64748b;
+        font-size: 1.3rem;
+        color: var(--text-color);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 700;
     }
-    .color-acc { color: #3b82f6; }
-    .color-prec { color: #10b981; }
-    .color-rec { color: #f59e0b; }
-    .color-f1 { color: #8b5cf6; }
+    .color-acc { color: var(--secondary); }
+    .color-prec { color: var(--primary); }
+    .color-rec { color: var(--accent); }
+    .color-f1 { color: var(--danger); }
 
-    /* Prediction Result Cards */
+    /* Prediction Cards */
     .result-card {
-        padding: 32px;
-        border-radius: 16px;
+        padding: 30px;
+        border: 4px solid var(--border-color);
+        box-shadow: 8px 8px 0px var(--shadow-color);
         text-align: center;
         margin-top: 24px;
         animation: fadeIn 0.4s ease-out;
     }
     .result-high {
-        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-        border: 2px solid #fca5a5;
-        color: #991b1b;
+        background-color: var(--danger);
+        color: #000;
     }
     .result-low {
-        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce3 100%);
-        border: 2px solid #86efac;
-        color: #166534;
+        background-color: var(--primary);
+        color: #000;
     }
     .result-title {
-        font-size: 2rem;
-        font-weight: 800;
+        font-size: 3rem;
+        font-weight: bold;
         margin-bottom: 12px;
+        text-transform: uppercase;
     }
     .result-prob {
-        font-size: 1.25rem;
-        font-weight: 500;
-        opacity: 0.95;
+        font-size: 1.6rem;
+        font-weight: bold;
+    }
+
+    /* Image wrapper */
+    .pixel-img-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0;
+    }
+    .pixel-img {
+        max-height: 220px !important;
+        border: 4px solid var(--border-color);
+        box-shadow: 6px 6px 0px var(--shadow-color);
+        object-fit: contain;
     }
 </style>
 """
@@ -202,27 +267,23 @@ def init_state():
 init_state()
 
 # --- SIDEBAR NAVIGATION ---
-st.sidebar.markdown("<div style='padding: 10px 0 20px 0;'><h2 style='margin:0; color:#0f172a;'>Progress Tracker</h2></div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div style='padding: 10px 0 20px 0;'><h1 style='margin:0;'>SYSTEM MENU</h1></div>", unsafe_allow_html=True)
 
 step_names = [
-    "Home",
-    "Exploratory Data Analysis",
-    "Feature Selection",
-    "Preprocessing",
-    "Modelling",
-    "Evaluation",
-    "Deployment"
+    "🏠 HOME",
+    "🔬 EDA",
+    "🧪 FEATURES",
+    "⚙️ PREPROCESS",
+    "🤖 MODEL",
+    "📊 EVAL",
+    "🧬 DEPLOY"
 ]
 
 for i, name in enumerate(step_names):
-    if i < st.session_state.current_step:
-        label = f"✓  {name}"
-    elif i == st.session_state.current_step:
-        label = f"●  {name}"
-    elif i <= st.session_state.max_step:
-        label = f"○  {name}"
+    if i <= st.session_state.max_step:
+        label = f"{name}"
     else:
-        label = f"🔒  {name}"
+        label = f"🔒 {name}"
         
     disabled = i > st.session_state.max_step
     btn_type = "primary" if i == st.session_state.current_step else "secondary"
@@ -232,7 +293,7 @@ for i, name in enumerate(step_names):
         st.rerun()
 
 st.sidebar.markdown("<br><br>", unsafe_allow_html=True)
-if st.sidebar.button("↻ Reset Progress", use_container_width=True):
+if st.sidebar.button("REBOOT SYSTEM", use_container_width=True):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
     st.rerun()
@@ -240,44 +301,36 @@ if st.sidebar.button("↻ Reset Progress", use_container_width=True):
 # --- STEPS RENDERING ---
 
 def render_step_0():
-    col1, col2 = st.columns([1.2, 1], gap="large", vertical_alignment="center")
-    with col1:
-        st.markdown('<div class="hero-title">Diabetes Risk Prediction</div>', unsafe_allow_html=True)
-        st.markdown('<div class="hero-subtitle">Advanced Health Analytics Platform</div>', unsafe_allow_html=True)
-        st.markdown("""
-        <p style='color: #475569; font-size: 1.05rem; line-height: 1.7; margin-bottom: 24px;'>
-        This modern, AI-powered application leverages advanced machine learning techniques to evaluate medical predictor variables and securely predict the likelihood of diabetes in patients.
-        </p>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Begin Analysis", type="primary"):
-            st.session_state.max_step = max(st.session_state.max_step, 1)
-            st.session_state.current_step = 1
-            st.rerun()
-            
-    with col2:
-        st.markdown("""
-        <div style='display: flex; justify-content: center; align-items: center; padding: 20px;'>
-            <img src='https://drive.google.com/uc?export=view&id=1eYm4Aca0sOwEcC6NElXjxIXEP7DxQOOc' style='max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); object-fit: cover;' />
-        </div>
-        """, unsafe_allow_html=True)
-
+    st.markdown('<div class="hero-title">DIABETES DIAGNOSTIC TERMINAL<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-subtitle">> PIXEL HOSPITAL SYSTEM v1.0</div>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="pixel-img-wrapper">
+        <img class="pixel-img" src="https://drive.google.com/uc?export=view&id=1eYm4Aca0sOwEcC6NElXjxIXEP7DxQOOc" />
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown("<br>", unsafe_allow_html=True)
 
     with st.container(border=True):
-        st.markdown('<div class="card-title">Platform Overview</div>', unsafe_allow_html=True)
-        c1, c2 = st.columns(2, gap="large")
-        with c1:
-            st.markdown("""
-            <h4 style='color: #1e293b; margin-bottom: 8px;'>Expected Output</h4>
-            <p style='color: #64748b; line-height: 1.6;'>Users receive a precise probability percentage indicating the risk of diabetes, supported by robust evaluation metrics and strict data validation protocols.</p>
-            """, unsafe_allow_html=True)
-        with c2:
-            st.markdown("""
-            <h4 style='color: #1e293b; margin-bottom: 8px;'>Target Audience & Data</h4>
-            <p style='color: #64748b; line-height: 1.6;'>Designed for Medical Professionals and Clinics. Built upon the renowned Pima Indians Diabetes Database containing comprehensive metabolic features.</p>
-            """, unsafe_allow_html=True)
+        st.markdown('<div class="card-title">SYSTEM INSTRUCTIONS</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="font-size: 1.4rem; line-height: 1.6;">
+        <b>[ROLE]:</b> DOCTOR<br>
+        <b>[TASK]:</b> RUN DIAGNOSTICS ON PATIENT METABOLIC DATA<br>
+        <b>[EXPECTED OUTPUT]:</b> PROBABILITY OF DIABETES RISK<br>
+        <b>[DATA SOURCE]:</b> PIMA INDIANS DATABASE<br>
+        <br>
+        > READY TO INITIATE SCAN...
+        </div>
+        """, unsafe_allow_html=True)
         
+        st.write("")
+        if st.button("INITIALIZE DIAGNOSTICS", type="primary", use_container_width=True):
+            st.session_state.max_step = max(st.session_state.max_step, 1)
+            st.session_state.current_step = 1
+            st.rerun()
+
     if st.session_state.df is None:
         try:
             st.session_state.df = pd.read_csv("diabetes.csv")
@@ -289,69 +342,73 @@ def render_step_0():
                 return
 
 def render_step_1():
-    st.markdown('<div class="hero-title" style="font-size: 2.2rem;">Exploratory Data Analysis</div>', unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; margin-bottom: 24px;'>Analyze the distributions and relationships of the predictor variables.</p>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">EXPLORATORY DATA ANALYSIS<span class="blink">_</span></div>', unsafe_allow_html=True)
     df = st.session_state.df
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Dataset Overview</div>', unsafe_allow_html=True)
-        with st.expander("🔍 View Raw Dataset", expanded=False):
+        st.markdown('<div class="card-title">DATA TERMINAL</div>', unsafe_allow_html=True)
+        st.markdown("<b style='font-size: 1.2rem;'>> SHOWING TOP 5 RECORDS:</b>", unsafe_allow_html=True)
+        st.dataframe(df.head(5), use_container_width=True)
+        
+        if st.button("VIEW FULL DATA"):
             st.dataframe(df, use_container_width=True)
-        with st.expander("📊 View Statistical Summary", expanded=False):
-            st.dataframe(df.describe(), use_container_width=True)
             
     with st.container(border=True):
-        st.markdown('<div class="card-title">Interactive Visualizations</div>', unsafe_allow_html=True)
-        plot_type = st.radio("Select Plot Type", ["Univariate", "Bivariate", "Multivariate"], horizontal=True, label_visibility="collapsed")
+        st.markdown('<div class="card-title">VISUAL DIAGNOSTICS</div>', unsafe_allow_html=True)
+        plot_type = st.radio("SELECT PLOT:", ["Univariate", "Bivariate", "Multivariate"], horizontal=True, label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         
         if plot_type == "Univariate":
-            col = st.selectbox("Select Feature for Distribution", df.columns)
+            col = st.selectbox("SELECT FEATURE:", df.columns)
             fig, ax = plt.subplots(figsize=(8, 4))
-            sns.histplot(df[col], kde=True, ax=ax, color='#3b82f6', edgecolor='white')
+            sns.histplot(df[col], kde=True, ax=ax, color='#22c55e', edgecolor='black', linewidth=2)
             ax.spines['top'].set_visible(False)
             ax.spines['right'].set_visible(False)
+            fig.patch.set_alpha(0)
+            ax.patch.set_alpha(0)
             st.pyplot(fig)
             
         elif plot_type == "Bivariate":
             col1, col2 = st.columns(2)
             with col1:
-                x_col = st.selectbox("X-axis Feature", df.columns)
+                x_col = st.selectbox("X-AXIS FEATURE:", df.columns)
             with col2:
-                y_col = st.selectbox("Y-axis Feature", [c for c in df.columns if c != x_col])
+                y_col = st.selectbox("Y-AXIS FEATURE:", [c for c in df.columns if c != x_col])
             fig, ax = plt.subplots(figsize=(8, 4))
-            sns.scatterplot(data=df, x=x_col, y=y_col, hue="Outcome", palette=["#3b82f6", "#ef4444"], ax=ax)
+            sns.scatterplot(data=df, x=x_col, y=y_col, hue="Outcome", palette=["#38bdf8", "#ef4444"], s=80, edgecolor='black', linewidth=1.5, ax=ax)
             ax.spines['top'].set_visible(False)
             ax.spines['right'].set_visible(False)
+            fig.patch.set_alpha(0)
+            ax.patch.set_alpha(0)
             st.pyplot(fig)
             
         elif plot_type == "Multivariate":
             fig, ax = plt.subplots(figsize=(10, 6))
-            sns.heatmap(df.corr(), annot=True, cmap="Blues", fmt=".2f", ax=ax, linewidths=0.5)
+            sns.heatmap(df.corr(), annot=True, cmap="Greens", fmt=".2f", ax=ax, linewidths=2, linecolor='black')
+            fig.patch.set_alpha(0)
             st.pyplot(fig)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Continue to Feature Selection", type="primary"):
+    if st.button("PROCEED TO FEATURE SELECTION", type="primary", use_container_width=True):
         st.session_state.max_step = max(st.session_state.max_step, 2)
         st.session_state.current_step = 2
         st.rerun()
 
 def render_step_2():
-    st.markdown('<div class="hero-title" style="font-size: 2.2rem;">Feature Selection</div>', unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; margin-bottom: 24px;'>Isolate the most crucial variables for model training.</p>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">FEATURE SELECTION<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Configure Predictor Variables</div>', unsafe_allow_html=True)
-        st.markdown("<p style='color: #475569; margin-bottom: 16px;'>Select the relevant features. The Target variable (Outcome) is automatically isolated and preserved.</p>", unsafe_allow_html=True)
+        st.markdown('<div class="card-title">ISOLATE VARIABLES</div>', unsafe_allow_html=True)
+        st.markdown("<p style='font-size: 1.4rem;'><b>> SELECT FEATURES FOR DIAGNOSTIC MODEL:</b></p>", unsafe_allow_html=True)
         
         df = st.session_state.df
         features = [col for col in df.columns if col != 'Outcome']
-        selected = st.multiselect("Predictor Variables", features, default=features, label_visibility="collapsed")
+        selected = st.multiselect("VARIABLES", features, default=features, label_visibility="collapsed")
     
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Continue to Preprocessing", type="primary"):
+    if st.button("CONFIRM VARIABLES", type="primary", use_container_width=True):
         if len(selected) == 0:
-            st.error("Please select at least one feature to proceed.")
+            st.error("ERROR: NO VARIABLES SELECTED.")
         else:
             st.session_state.selected_features = selected
             st.session_state.max_step = max(st.session_state.max_step, 3)
@@ -359,19 +416,18 @@ def render_step_2():
             st.rerun()
 
 def render_step_3():
-    st.markdown('<div class="hero-title" style="font-size: 2.2rem;">Data Preprocessing</div>', unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; margin-bottom: 24px;'>Cleanse, split, and scale the data to prevent leakage and optimize training.</p>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">PREPROCESSING<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     df = st.session_state.df
     selected_features = st.session_state.selected_features
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Pipeline Configuration</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">PIPELINE CONFIG</div>', unsafe_allow_html=True)
         col1, col2 = st.columns(2, gap="large")
         with col1:
-            test_size = st.slider("Test Set Size (%)", 10, 50, 20) / 100.0
+            test_size = st.slider("TEST SET SIZE (%)", 10, 50, 20) / 100.0
         with col2:
-            scaler_choice = st.selectbox("Scaling Method", ["StandardScaler", "MinMaxScaler", "RobustScaler"])
+            scaler_choice = st.selectbox("SCALING ALGORITHM", ["StandardScaler", "MinMaxScaler", "RobustScaler"])
             
     X = df[selected_features].copy()
     y = df['Outcome'].copy()
@@ -398,17 +454,17 @@ def render_step_3():
     X_test_scaled = pd.DataFrame(scaler.transform(X_test_imputed), columns=X_test.columns)
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Processed Data Overview</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">PROCESSED DATA OVERVIEW</div>', unsafe_allow_html=True)
         c1, c2 = st.columns(2)
-        c1.markdown(f"<div style='font-size: 1.1rem;'><b>Training Samples:</b> <span style='color:#3b82f6;'>{X_train_scaled.shape[0]}</span></div>", unsafe_allow_html=True)
-        c2.markdown(f"<div style='font-size: 1.1rem;'><b>Testing Samples:</b> <span style='color:#10b981;'>{X_test_scaled.shape[0]}</span></div>", unsafe_allow_html=True)
+        c1.markdown(f"<div style='font-size: 1.6rem;'><b>> TRAINING SAMPLES:</b> {X_train_scaled.shape[0]}</div>", unsafe_allow_html=True)
+        c2.markdown(f"<div style='font-size: 1.6rem;'><b>> TESTING SAMPLES:</b> {X_test_scaled.shape[0]}</div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         
-        with st.expander("View Preprocessed Training Sample"):
-            st.dataframe(X_train_scaled.head(), use_container_width=True)
+        st.markdown("<b style='font-size: 1.2rem;'>> PREPROCESSED SAMPLE (TOP 5):</b>", unsafe_allow_html=True)
+        st.dataframe(X_train_scaled.head(5), use_container_width=True)
             
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Continue to Modelling", type="primary"):
+    if st.button("INITIALIZE MODELLING", type="primary", use_container_width=True):
         st.session_state.X_train = X_train_scaled
         st.session_state.X_test = X_test_scaled
         st.session_state.y_train = y_train
@@ -420,34 +476,33 @@ def render_step_3():
         st.rerun()
 
 def render_step_4():
-    st.markdown('<div class="hero-title" style="font-size: 2.2rem;">Model Training</div>', unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; margin-bottom: 24px;'>Configure hyperparameters and fit the machine learning algorithm.</p>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">MODEL CONFIGURATION<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Algorithm Configuration</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">ALGORITHM PARAMETERS</div>', unsafe_allow_html=True)
         col1, col2 = st.columns([1, 1.5], gap="large")
         with col1:
-            algo = st.selectbox("Select Algorithm", ["Random Forest", "SVM", "Logistic Regression", "KNN"])
+            algo = st.selectbox("SELECT ALGORITHM", ["Random Forest", "SVM", "Logistic Regression", "KNN"])
             
         with col2:
             if algo == "Random Forest":
-                n_estimators = st.number_input("Trees (n_estimators)", 10, 500, 100)
-                max_depth = st.number_input("Max Depth", 1, 50, 10)
+                n_estimators = st.number_input("TREES (n_estimators)", 10, 500, 100)
+                max_depth = st.number_input("MAX DEPTH", 1, 50, 10)
                 model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, random_state=42)
             elif algo == "SVM":
-                C = st.number_input("Regularization (C)", 0.1, 100.0, 1.0)
-                kernel = st.selectbox("Kernel", ["linear", "poly", "rbf", "sigmoid"], index=2)
+                C = st.number_input("REGULARIZATION (C)", 0.1, 100.0, 1.0)
+                kernel = st.selectbox("KERNEL", ["linear", "poly", "rbf", "sigmoid"], index=2)
                 model = SVC(C=C, kernel=kernel, probability=True, random_state=42)
             elif algo == "Logistic Regression":
-                C_lr = st.number_input("Inverse Reg. (C)", 0.01, 100.0, 1.0)
+                C_lr = st.number_input("INVERSE REG. (C)", 0.01, 100.0, 1.0)
                 model = LogisticRegression(C=C_lr, random_state=42)
             elif algo == "KNN":
-                n_neighbors = st.number_input("Neighbors", 1, 50, 5)
+                n_neighbors = st.number_input("NEIGHBORS", 1, 50, 5)
                 model = KNeighborsClassifier(n_neighbors=n_neighbors)
                 
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Train Model & Proceed", type="primary"):
-        with st.spinner("Training model..."):
+    if st.button("COMPILE & TRAIN MODEL", type="primary", use_container_width=True):
+        with st.spinner("TRAINING IN PROGRESS..."):
             model.fit(st.session_state.X_train, st.session_state.y_train)
             st.session_state.model = model
             st.session_state.max_step = max(st.session_state.max_step, 5)
@@ -455,11 +510,10 @@ def render_step_4():
         st.rerun()
 
 def render_step_5():
-    st.markdown('<div class="hero-title" style="font-size: 2.2rem;">Model Evaluation</div>', unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; margin-bottom: 24px;'>Review the performance metrics of your trained model.</p>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">EVALUATION METRICS<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     if st.session_state.model is None:
-        st.warning("Please train a model in the Modelling step first.")
+        st.warning("SYSTEM ERROR: NO MODEL TRAINED.")
         return
         
     model = st.session_state.model
@@ -476,52 +530,52 @@ def render_step_5():
     metrics_html = f"""
     <div class="metrics-wrapper">
         <div class="metric-box">
-            <div class="metric-value color-acc">{acc:.4f}</div>
-            <div class="metric-label">Accuracy</div>
+            <div class="metric-value color-acc">{acc*100:.1f}%</div>
+            <div class="metric-label">ACCURACY</div>
         </div>
         <div class="metric-box">
-            <div class="metric-value color-prec">{prec:.4f}</div>
-            <div class="metric-label">Precision</div>
+            <div class="metric-value color-prec">{prec*100:.1f}%</div>
+            <div class="metric-label">PRECISION</div>
         </div>
         <div class="metric-box">
-            <div class="metric-value color-rec">{rec:.4f}</div>
-            <div class="metric-label">Recall</div>
+            <div class="metric-value color-rec">{rec*100:.1f}%</div>
+            <div class="metric-label">RECALL</div>
         </div>
         <div class="metric-box">
-            <div class="metric-value color-f1">{f1:.4f}</div>
-            <div class="metric-label">F1-Score</div>
+            <div class="metric-value color-f1">{f1*100:.1f}%</div>
+            <div class="metric-label">F1-SCORE</div>
         </div>
     </div>
     """
     st.markdown(metrics_html, unsafe_allow_html=True)
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Confusion Matrix</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">CONFUSION MATRIX</div>', unsafe_allow_html=True)
         cm = confusion_matrix(y_test, y_pred)
         annot_labels = np.array([
-            [f"True Negative (TN)\n{cm[0,0]}", f"False Positive (FP)\n{cm[0,1]}"],
-            [f"False Negative (FN)\n{cm[1,0]}", f"True Positive (TP)\n{cm[1,1]}"]
+            [f"TRUE NEG (TN)\n{cm[0,0]}", f"FALSE POS (FP)\n{cm[0,1]}"],
+            [f"FALSE NEG (FN)\n{cm[1,0]}", f"TRUE POS (TP)\n{cm[1,1]}"]
         ])
         
         fig, ax = plt.subplots(figsize=(7, 4.5))
-        sns.heatmap(cm, annot=annot_labels, fmt='', cmap='Blues', ax=ax, cbar=False, 
-                    annot_kws={"size": 11, "weight": "bold"}, linewidths=1)
-        ax.set_xlabel('Predicted Label', fontweight='bold', labelpad=12, color='#1e293b')
-        ax.set_ylabel('True Label', fontweight='bold', labelpad=12, color='#1e293b')
+        sns.heatmap(cm, annot=annot_labels, fmt='', cmap='Greens', ax=ax, cbar=False, 
+                    annot_kws={"size": 12, "weight": "bold", "family": "monospace"}, linewidths=2, linecolor='black')
+        ax.set_xlabel('PREDICTED LABEL', fontweight='bold', labelpad=12)
+        ax.set_ylabel('TRUE LABEL', fontweight='bold', labelpad=12)
+        fig.patch.set_alpha(0)
         st.pyplot(fig)
         
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Unlock Deployment", type="primary"):
+    if st.button("LAUNCH DEPLOYMENT SYSTEM", type="primary", use_container_width=True):
         st.session_state.max_step = max(st.session_state.max_step, 6)
         st.session_state.current_step = 6
         st.rerun()
 
 def render_step_6():
-    st.markdown('<div class="hero-title" style="font-size: 2.2rem;">Live Prediction</div>', unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; margin-bottom: 24px;'>Enter real patient details below to generate a diagnosis probability.</p>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">LIVE DIAGNOSTICS<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
-        st.markdown('<div class="card-title">Patient Input Form</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">INPUT PATIENT DATA</div>', unsafe_allow_html=True)
         selected_features = st.session_state.selected_features
         user_input = {}
         
@@ -534,7 +588,7 @@ def render_step_6():
                     user_input[feature] = st.number_input(f"{feature}", value=0.0, step=0.1)
                     
         st.markdown("<br>", unsafe_allow_html=True)
-        submit_btn = st.button("Generate Prediction", type="primary", use_container_width=True)
+        submit_btn = st.button("EXECUTE SCAN", type="primary", use_container_width=True)
         
     if submit_btn:
         input_df = pd.DataFrame([user_input])
@@ -554,15 +608,17 @@ def render_step_6():
         if pred == 1:
             res_html = f"""
             <div class="result-card result-high">
-                <div class="result-title">⚠️ High Risk</div>
-                <div class="result-prob">The model predicts the patient is <b>Diabetic</b> with a {prob*100:.1f}% probability.</div>
+                <div class="result-title">⚠️ HIGH RISK DETECTED ⚠️</div>
+                <div class="result-prob">DIAGNOSIS: DIABETIC</div>
+                <div style="font-size:1.4rem; margin-top:10px;">PROBABILITY: {prob*100:.1f}%</div>
             </div>
             """
         else:
             res_html = f"""
             <div class="result-card result-low">
-                <div class="result-title">✅ Low Risk</div>
-                <div class="result-prob">The model predicts the patient is <b>Non-Diabetic</b> with a {(1-prob)*100:.1f}% probability.</div>
+                <div class="result-title">✅ PATIENT STABLE ✅</div>
+                <div class="result-prob">DIAGNOSIS: NON-DIABETIC</div>
+                <div style="font-size:1.4rem; margin-top:10px;">PROBABILITY: {(1-prob)*100:.1f}%</div>
             </div>
             """
         st.markdown(res_html, unsafe_allow_html=True)
