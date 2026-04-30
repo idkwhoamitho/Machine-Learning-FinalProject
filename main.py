@@ -12,7 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
-st.set_page_config(page_title="Diabetes Prediction Program", page_icon="🕹️", layout="wide")
+st.set_page_config(page_title="Diabetes Prediction Program", page_icon="🩺", layout="wide")
 
 custom_css = """
 <style>
@@ -336,11 +336,11 @@ custom_css = """
         background-color: var(--panel-bg);
         border: 2px solid var(--border-color);
         box-shadow: 4px 4px 0px var(--shadow-color);
-        padding: 20px;
-        margin-bottom: 20px;
+        padding: 15px;
+        margin-bottom: 10px;
         position: relative;
         overflow: hidden;
-        min-height: 200px;
+        min-height: 100px;
         transition: transform 0.2s ease-in-out;
     }
     .heartbeat-box:hover {
@@ -361,48 +361,26 @@ custom_css = """
     .heartbeat-content {
         position: relative;
         z-index: 1;
-        font-size: 1.25rem;
-        line-height: 1.5;
+        font-size: 1.1rem;
+        line-height: 1.4;
         color: var(--text-color);
         font-family: 'VT323', monospace !important;
         letter-spacing: 1px;
     }
     .heartbeat-title {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: bold;
         color: var(--text-color);
-        margin-bottom: 10px;
+        margin-bottom: 5px;
         border-bottom: 2px dashed var(--border-color);
         display: inline-block;
-        padding-bottom: 4px;
+        padding-bottom: 2px;
         font-family: 'VT323', monospace !important;
     }
+
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-
-def apply_plot_theme(ax, fig):
-    """Applies theme-aware colors to matplotlib axes"""
-    try:
-        base = st.get_option("theme.base")
-    except:
-        base = "light"
-
-    if base == "dark":
-        color = '#ecfdf5'
-    else:
-        color = '#0f172a'
-        
-    ax.tick_params(colors=color)
-    ax.xaxis.label.set_color(color)
-    ax.yaxis.label.set_color(color)
-    
-    for spine in ax.spines.values():
-        spine.set_edgecolor(color)
-
-    fig.patch.set_alpha(0)
-    ax.set_facecolor('none')
-    plt.tight_layout()
 
 def init_state():
     defaults = {
@@ -417,7 +395,11 @@ def init_state():
 init_state()
 
 # --- SIDEBAR NAVIGATION ---
-st.sidebar.markdown("<div style='padding: 10px 0 20px 0;'><h1 style='margin:0; color:var(--text-color);'>SYSTEM MENU</h1></div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div style='padding: 10px 0 10px 0;'><h1 style='margin:0; color:var(--text-color); font-family: \"VT323\", monospace;'>SYSTEM MENU</h1></div>", unsafe_allow_html=True)
+
+progress_percent = int((st.session_state.current_step / 6.0) * 100)
+st.sidebar.progress(st.session_state.current_step / 6.0, text=f"WORKFLOW PROGRESS: {progress_percent}%")
+st.sidebar.markdown("<br>", unsafe_allow_html=True)
 
 step_names = [
     "🏠 HOME",
@@ -451,9 +433,7 @@ if st.sidebar.button("REBOOT SYSTEM", use_container_width=True):
 # --- STEPS RENDERING ---
 
 def render_step_0():
-    st.markdown('<div class="hero-title">DIABETES DIAGNOSTIC TERMINAL<span class="blink">_</span></div>', unsafe_allow_html=True)    
-    
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">ASSIGNMENT MACHINE LEARNING<span class="blink">_</span></div>', unsafe_allow_html=True)
 
     with st.container(border=True):
         st.markdown('<div class="card-title">SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
@@ -517,7 +497,7 @@ def render_step_0():
                 return
 
 def render_step_1():
-    st.markdown('<div class="hero-title">EXPLORATORY DATA ANALYSIS<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">FIRST STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
     df = st.session_state.df
     
     with st.container(border=True):
@@ -539,7 +519,6 @@ def render_step_1():
             sns.histplot(df[col], kde=True, ax=ax, color='#16a34a', edgecolor='gray', linewidth=1)
             ax.spines['top'].set_visible(False)
             ax.spines['right'].set_visible(False)
-            apply_plot_theme(ax, fig)
             st.pyplot(fig, use_container_width=False)
             
         elif plot_type == "Bivariate":
@@ -552,7 +531,6 @@ def render_step_1():
             sns.scatterplot(data=df, x=x_col, y=y_col, hue="Outcome", palette=["#38bdf8", "#ef4444"], s=40, edgecolor='gray', linewidth=1, ax=ax)
             ax.spines['top'].set_visible(False)
             ax.spines['right'].set_visible(False)
-            apply_plot_theme(ax, fig)
             st.pyplot(fig, use_container_width=False)
             
         elif plot_type == "Multivariate":
@@ -560,7 +538,6 @@ def render_step_1():
             plt.xticks(rotation=45, ha='right')
             plt.yticks(rotation=0)
             sns.heatmap(df.corr(), annot=True, cmap="Greens", fmt=".2f", ax=ax, linewidths=1, linecolor='gray')
-            apply_plot_theme(ax, fig)
             st.pyplot(fig, use_container_width=False)
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -570,7 +547,7 @@ def render_step_1():
         st.rerun()
 
 def render_step_2():
-    st.markdown('<div class="hero-title">FEATURE SELECTION<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">SECOND STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
         st.markdown('<div class="card-title">ISOLATE VARIABLES</div>', unsafe_allow_html=True)
@@ -591,7 +568,7 @@ def render_step_2():
             st.rerun()
 
 def render_step_3():
-    st.markdown('<div class="hero-title">PREPROCESSING<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">THIRD STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     df = st.session_state.df
     selected_features = st.session_state.selected_features
@@ -631,8 +608,8 @@ def render_step_3():
     with st.container(border=True):
         st.markdown('<div class="card-title">PROCESSED DATA OVERVIEW</div>', unsafe_allow_html=True)
         c1, c2 = st.columns(2)
-        c1.markdown(f"<div style='font-size: 1.6rem; color: var(--text-color);'><b>> TRAINING SAMPLES:</b> {X_train_scaled.shape[0]}</div>", unsafe_allow_html=True)
-        c2.markdown(f"<div style='font-size: 1.6rem; color: var(--text-color);'><b>> TESTING SAMPLES:</b> {X_test_scaled.shape[0]}</div>", unsafe_allow_html=True)
+        c1.markdown(f"<div style='font-size: 1.6rem; font-family: \"VT323\", monospace; color: var(--text-color);'><b>> TRAINING SAMPLES:</b> {X_train_scaled.shape[0]}</div>", unsafe_allow_html=True)
+        c2.markdown(f"<div style='font-size: 1.6rem; font-family: \"VT323\", monospace; color: var(--text-color);'><b>> TESTING SAMPLES:</b> {X_test_scaled.shape[0]}</div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         
         st.markdown("<b style='font-size: 1.2rem; color: var(--text-color);'>> PREPROCESSED SAMPLE (TOP 5):</b>", unsafe_allow_html=True)
@@ -651,7 +628,7 @@ def render_step_3():
         st.rerun()
 
 def render_step_4():
-    st.markdown('<div class="hero-title">MODEL CONFIGURATION<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">FOURTH STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
         st.markdown('<div class="card-title">ALGORITHM PARAMETERS</div>', unsafe_allow_html=True)
@@ -685,7 +662,7 @@ def render_step_4():
         st.rerun()
 
 def render_step_5():
-    st.markdown('<div class="hero-title">EVALUATION METRICS<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">FIFTH STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     if st.session_state.model is None:
         st.warning("SYSTEM ERROR: NO MODEL TRAINED.")
@@ -732,12 +709,11 @@ def render_step_5():
             [f"FALSE NEG (FN)\n{cm[1,0]}", f"TRUE POS (TP)\n{cm[1,1]}"]
         ])
         
-        fig, ax = plt.subplots(figsize=(5, 3))
+        fig, ax = plt.subplots(figsize=(4, 2))
         sns.heatmap(cm, annot=annot_labels, fmt='', cmap='Greens', ax=ax, cbar=False, 
                     annot_kws={"size": 10, "weight": "bold", "family": "monospace"}, linewidths=1, linecolor='gray')
         ax.set_xlabel('PREDICTED LABEL', fontweight='bold', labelpad=12)
         ax.set_ylabel('TRUE LABEL', fontweight='bold', labelpad=12)
-        apply_plot_theme(ax, fig)
         st.pyplot(fig, use_container_width=False)
         
     st.markdown("<br>", unsafe_allow_html=True)
@@ -747,7 +723,7 @@ def render_step_5():
         st.rerun()
 
 def render_step_6():
-    st.markdown('<div class="hero-title">LIVE DIAGNOSTICS<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">SIXTH STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
         st.markdown('<div class="card-title">INPUT PATIENT DATA</div>', unsafe_allow_html=True)
@@ -785,7 +761,7 @@ def render_step_6():
             <div class="result-card result-high">
                 <div class="result-title">⚠️ HIGH RISK DETECTED ⚠️</div>
                 <div class="result-prob">DIAGNOSIS: DIABETIC</div>
-                <div style="font-size:1.4rem; margin-top:10px; color:#0f172a;">PROBABILITY: {prob*100:.1f}%</div>
+                <div style="font-size:1.4rem; font-family: 'VT323', monospace; margin-top:10px; color:#0f172a;">PROBABILITY: {prob*100:.1f}%</div>
             </div>
             """
         else:
@@ -793,7 +769,7 @@ def render_step_6():
             <div class="result-card result-low">
                 <div class="result-title">✅ PATIENT STABLE ✅</div>
                 <div class="result-prob">DIAGNOSIS: NON-DIABETIC</div>
-                <div style="font-size:1.4rem; margin-top:10px; color:#0f172a;">PROBABILITY: {(1-prob)*100:.1f}%</div>
+                <div style="font-size:1.4rem; font-family: 'VT323', monospace; margin-top:10px; color:#0f172a;">PROBABILITY: {(1-prob)*100:.1f}%</div>
             </div>
             """
         st.markdown(res_html, unsafe_allow_html=True)
