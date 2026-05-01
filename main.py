@@ -406,9 +406,9 @@ step_names = [
     "🔬 EDA",
     "🧪 FEATURES",
     "⚙️ PREPROCESS",
-    "🤖 MODEL",
-    "📊 EVAL",
-    "🧬 DEPLOY"
+    "🤖 MODELLING",
+    "📊 EVALUATION",
+    "🧬 PREDICTION"
 ]
 
 for i, name in enumerate(step_names):
@@ -433,7 +433,7 @@ if st.sidebar.button("REBOOT SYSTEM", use_container_width=True):
 # --- STEPS RENDERING ---
 
 def render_step_0():
-    st.markdown('<div class="hero-title">ASSIGNMENT MACHINE LEARNING<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">DIABETES PREDICTION PROGRAM<span class="blink">_</span></div>', unsafe_allow_html=True)
 
     with st.container(border=True):
         st.markdown('<div class="card-title">SYSTEM OVERVIEW</div>', unsafe_allow_html=True)
@@ -497,7 +497,7 @@ def render_step_0():
                 return
 
 def render_step_1():
-    st.markdown('<div class="hero-title">FIRST STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">EXPLORATORY DATA ANALYSIS<span class="blink">_</span></div>', unsafe_allow_html=True)
     df = st.session_state.df
     
     with st.container(border=True):
@@ -547,7 +547,7 @@ def render_step_1():
         st.rerun()
 
 def render_step_2():
-    st.markdown('<div class="hero-title">SECOND STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">FEATURES SELECTION<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
         st.markdown('<div class="card-title">ISOLATE VARIABLES</div>', unsafe_allow_html=True)
@@ -568,7 +568,7 @@ def render_step_2():
             st.rerun()
 
 def render_step_3():
-    st.markdown('<div class="hero-title">THIRD STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">PREPROCESSING<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     df = st.session_state.df
     selected_features = st.session_state.selected_features
@@ -628,7 +628,7 @@ def render_step_3():
         st.rerun()
 
 def render_step_4():
-    st.markdown('<div class="hero-title">FOURTH STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">MODEL SELECTION<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
         st.markdown('<div class="card-title">ALGORITHM PARAMETERS</div>', unsafe_allow_html=True)
@@ -662,7 +662,7 @@ def render_step_4():
         st.rerun()
 
 def render_step_5():
-    st.markdown('<div class="hero-title">FIFTH STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">EVALUATION MODEL<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     if st.session_state.model is None:
         st.warning("SYSTEM ERROR: NO MODEL TRAINED.")
@@ -723,7 +723,7 @@ def render_step_5():
         st.rerun()
 
 def render_step_6():
-    st.markdown('<div class="hero-title">SIXTH STEP<span class="blink">_</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="hero-title">PREDICTION<span class="blink">_</span></div>', unsafe_allow_html=True)
     
     with st.container(border=True):
         st.markdown('<div class="card-title">INPUT PATIENT DATA</div>', unsafe_allow_html=True)
