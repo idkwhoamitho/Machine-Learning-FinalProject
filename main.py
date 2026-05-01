@@ -509,6 +509,25 @@ def render_step_1():
             st.dataframe(df, use_container_width=True)
             
     with st.container(border=True):
+        st.markdown('<div class="card-title">DATASET OVERVIEW</div>', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("<b style='font-size: 1.2rem; color: var(--text-color);'>> DATA TYPES & MISSING VALUES:</b>", unsafe_allow_html=True)
+            info_df = pd.DataFrame({
+                'Data Type': df.dtypes.astype(str),
+                'Missing Values': df.isnull().sum()
+            })
+            st.dataframe(info_df, use_container_width=True)
+            
+        with col2:
+            st.markdown("<b style='font-size: 1.2rem; color: var(--text-color);'>> DATASET SHAPE:</b>", unsafe_allow_html=True)
+            st.markdown(f"<div style='font-size: 1.6rem; font-family: \"VT323\", monospace; color: var(--text-color); margin-bottom: 20px;'>{df.shape[0]} ROWS × {df.shape[1]} COLUMNS</div>", unsafe_allow_html=True)
+            
+        st.markdown("<b style='font-size: 1.2rem; color: var(--text-color);'>> STATISTICAL SUMMARY:</b>", unsafe_allow_html=True)
+        st.dataframe(df.describe(), use_container_width=True)
+            
+    with st.container(border=True):
         st.markdown('<div class="card-title">VISUAL DIAGNOSTICS</div>', unsafe_allow_html=True)
         plot_type = st.radio("SELECT PLOT:", ["Univariate", "Bivariate", "Multivariate"], horizontal=True, label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
